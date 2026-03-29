@@ -4,7 +4,8 @@ The Computational Epistemology of Dyadic Formation is a computational philosophy
 ---
 
 ## Contributors
-* [**Koorosh Nobakhtfar (@KCyrusNF)**](https://github.com/KCyrusNF) — Lead Researcher
+* Koorosh Nobakhtfar — Lead Researcher [[GitHub](https://github.com/KCyrusNF) | [LinkedIn](https://www.linkedin.com/in/kcyrusnf/)]
+* Sezin Su Uysal — Co-researcher [[GitHub](https://github.com/sezinuysal)]
 
 ---
 
@@ -15,8 +16,12 @@ This research utilizes a dual-licensing framework designed to safeguard the inte
 ### 1. Source Code ([CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/))
 All functional source code and logic located within the `models/` directory and its sub-directories are licensed under **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International**.
 
-This includes:
-* **Python Scripts:** All `*.py` files containing agent logic and simulation frameworks.
+This includes, but is not limited to:
+* **C#** (`*.cs`, `*.dll`, `*.exe`)
+* **C / C++** (`*.c`, `*.cpp`, `*.h`, `*.hpp`, `*.o`, `*.out`, `*.exe`)
+* **Python** (`*.py`, `*.pyc`, `*.pyo`)
+* **Java** (`*.java`, `*.class`, `*.jar`, `*.war`, `*.ear`)
+* **Other source code files** containing agent logic, simulation frameworks, or related implementation code
 
 **Terms:**
 * **Modification & Sharing:** You are free to adapt and build upon the code.
@@ -28,8 +33,8 @@ To maintain the integrity and provenance of the study, the primary project docum
 
 This includes, but is not limited to:
 * **Manuscripts & Documentation:** The main project `README.md`, all formal reports, manuscripts, PDFs, LaTeX source files (`.tex`), and descriptive `README.md` files located within model sub-directories.
-* **Visual Assets:** All research figures, charts, diagrams, plots, and vector graphics (`.png`, `.svg`, `.pdf`).
-* **Empirical Evidence:** All raw simulation outputs, interaction records, system logs, and generated datasets (`.log`, `.csv`, `.json`).
+* **Visual Assets:** All research figures, charts, diagrams, plots, and vector graphics (e.g., `.png`, `.svg`, `.pdf`, `.drawio` etc.).
+* **Empirical Evidence:** All raw simulation outputs, interaction records, system logs, and generated datasets (e.g., `.log`, `.csv`, `.json`, etc.).
 
 **Terms:**
 * **Integrity:** This prevents the modification of raw evidence and research conclusions while allowing for broad, non-commercial academic distribution.
@@ -40,9 +45,18 @@ This includes, but is not limited to:
 
 | Asset Category | Primary Locations | Local License | Official Deed |
 | :--- | :--- | :--- | :--- |
-| **Simulation Code** | `models/` | [LICENSE-CODE](LICENSE-CODE) | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
-| **Documentation** | `README.md`, `models/**/README.md` | [LICENSE](LICENSE) | [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/) |
-| **Research Output** | `docs/`, `logs/` | [LICENSE](LICENSE) | [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/) |
+| **Simulation Code** | `*/` (model directories) | [LICENSE-CODE](LICENSE-CODE) | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| **Documentation** | `README.md`, `*/README.md` | [LICENSE](LICENSE) | [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/) |
+| **Research Materials** | `docs/`, `logs/` | [LICENSE](LICENSE) | [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/) |
+
+### In simple terms
+You can use this project for personal use, education, and research as much as you like, as long as you **don’t use it for commercial purposes**. The main thing we ask is simple: **give proper credit** to the authors when you use any part of this work.
+
+You are also free to **modify or extend the code** to fit your own needs. However, if you share your modified code, it must also be released under the **same license**.
+
+The research data, documentation, and results are different. You can use and share them for academic or personal purposes, but you **cannot modify and redistribute them**. This is to make sure the published results remain a reliable and unchanged record of the research. If you change the code and run your own experiments, your results should be presented as your own separate work, not as part of this original study. However, you must still **give proper credit to this project** as the source of the original code, data, or methodology if they were used in your work.
+
+Think of it like this: you can experiment with the machine, but you shouldn’t rewrite the original lab notebook.
 
 ---
 
