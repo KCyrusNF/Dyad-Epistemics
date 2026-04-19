@@ -1,0 +1,151 @@
+@startuml
+title "Model 01: Venus Sequence Diagram"
+
+actor User
+participant "CLI System" as CLISystem
+participant "Configuration Controller" as ConfigController
+participant AgentBuilder
+participant SimulationEngine
+participant Mediator
+participant Logger
+
+participant "Agent A" as AgentA
+participant "Rule Engine A" as RuleEngineA
+participant "Agent B" as AgentB
+participant "Rule Engine B" as RuleEngineB
+
+== System Initialization ==
+
+CLISystem -> ConfigController : initializeSystem()
+
+== User Interaction ==
+
+User -> CLISystem : enter command (start/configure)
+CLISystem -> ConfigController : parseCommand()
+
+== Configuration Phase ==
+
+activate ConfigController
+
+ConfigController -> AgentBuilder : buildAgents()
+activate AgentBuilder
+
+create AgentA
+AgentBuilder -> AgentA : createAgent()
+
+create RuleEngineA
+AgentBuilder -> RuleEngineA : assignRuleEngine()
+
+create AgentB
+AgentBuilder -> AgentB : createAgent()
+
+create RuleEngineB
+AgentBuilder -> RuleEngineB : assignRuleEngine()
+
+AgentBuilder --> ConfigController : agentsReady()
+deactivate AgentBuilder
+
+ConfigController -> SimulationEngine : setParameters()
+ConfigController --> CLISystem : configurationReady()
+
+deactivate ConfigController
+
+== Start Simulation ==
+
+CLISystem -> SimulationEngine : startSimulation()
+activate SimulationEngine
+
+loop Until matching is complete
+
+    SimulationEngine -> SimulationEngine : selectNextFreeAgent()
+    SimulationEngine -> Mediator : activateAgent(AgentA)
+    activate Mediator
+
+    Mediator -> AgentA : requestAction()
+    activate AgentA
+
+    AgentA -> RuleEngineA : decideNextAction()
+    activate RuleEngineA
+    RuleEngineA --> AgentA : propose(AgentB) / noAction
+    deactivate RuleEngineA
+
+    alt AgentA has no request
+        AgentA --> Mediator : noAction
+        deactivate AgentA
+
+        Mediator -> Logger : logEvent(noAction)
+        activate Logger
+        Logger --> Mediator : logged
+        deactivate Logger
+
+    else AgentA proposes to AgentB
+        AgentA --> Mediator : proposal(AgentB)
+        deactivate AgentA
+
+        Mediator -> AgentB : deliverProposal(from AgentA)
+        activate AgentB
+
+        AgentB -> RuleEngineB : evaluateIncomingProposal()
+        activate RuleEngineB
+        RuleEngineB --> AgentB : accept / reject / switch
+        deactivate RuleEngineB
+
+        alt Accept
+            AgentB --> Mediator : accept
+            deactivate AgentB
+
+            Mediator -> AgentA : updateMatch(AgentB)
+            activate AgentA
+            AgentA --> Mediator : acknowledged
+            deactivate AgentA
+
+            Mediator -> AgentB : updateMatch(AgentA)
+            activate AgentB
+            AgentB --> Mediator : acknowledged
+            deactivate AgentB
+
+        else Reject
+            AgentB --> Mediator : reject
+            deactivate AgentB
+
+            Mediator -> AgentA : notifyRejection()
+            activate AgentA
+            AgentA --> Mediator : acknowledged
+            deactivate AgentA
+
+        else Switch
+            AgentB --> Mediator : switch
+            deactivate AgentB
+
+            Mediator -> AgentA : updateMatch(AgentB)
+            activate AgentA
+            AgentA --> Mediator : acknowledged
+            deactivate AgentA
+
+            Mediator -> AgentB : updateMatch(AgentA)
+            activate AgentB
+            AgentB --> Mediator : acknowledged
+            deactivate AgentB
+
+            Mediator -> Mediator : releaseOldMatch()
+        end
+
+        Mediator -> Logger : logEvent()
+        activate Logger
+        Logger --> Mediator : logged
+        deactivate Logger
+    end
+
+    deactivate Mediator
+
+    SimulationEngine -> SimulationEngine : checkCompletion()
+
+end
+
+== Output ==
+
+SimulationEngine --> CLISystem : resultsReady()
+deactivate SimulationEngine
+
+CLISystem -> User : showOutput()
+@enduml
