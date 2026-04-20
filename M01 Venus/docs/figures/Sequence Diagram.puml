@@ -1,5 +1,7 @@
 @startuml
-title "Model 01: Venus Sequence Diagram"
+
+
+title "Model 01: Venus Sequence Diagram (Cycle-based Logging)"
 
 actor User
 participant "CLI System" as CLISystem
@@ -13,6 +15,8 @@ participant "Agent A" as AgentA
 participant "Rule Engine A" as RuleEngineA
 participant "Agent B" as AgentB
 participant "Rule Engine B" as RuleEngineB
+participant "Agent C" as AgentC
+participant "Rule Engine C" as RuleEngineC
 
 == System Initialization ==
 
@@ -32,15 +36,18 @@ activate AgentBuilder
 
 create AgentA
 AgentBuilder -> AgentA : createAgent()
-
 create RuleEngineA
 AgentBuilder -> RuleEngineA : assignRuleEngine()
 
 create AgentB
 AgentBuilder -> AgentB : createAgent()
-
 create RuleEngineB
 AgentBuilder -> RuleEngineB : assignRuleEngine()
+
+create AgentC
+AgentBuilder -> AgentC : createAgent()
+create RuleEngineC
+AgentBuilder -> RuleEngineC : assignRuleEngine()
 
 AgentBuilder --> ConfigController : agentsReady()
 deactivate AgentBuilder
@@ -61,15 +68,17 @@ loop Until matching is complete
     SimulationEngine -> Mediator : activateAgent(AgentA)
     activate Mediator
 
+    == Action Request ==
+
     Mediator -> AgentA : requestAction()
     activate AgentA
 
-    AgentA -> RuleEngineA : decideNextAction()
+    AgentA -> RuleEngineA : decideNextAction(knownCandidates)
     activate RuleEngineA
-    RuleEngineA --> AgentA : propose(AgentB) / noAction
+    RuleEngineA --> AgentA : propose(target) / requestIntroduction / noAction
     deactivate RuleEngineA
 
-    alt AgentA has no request
+    alt noAction
         AgentA --> Mediator : noAction
         deactivate AgentA
 
@@ -78,7 +87,26 @@ loop Until matching is complete
         Logger --> Mediator : logged
         deactivate Logger
 
-    else AgentA proposes to AgentB
+    else requestIntroduction
+        AgentA --> Mediator : requestIntroduction
+        deactivate AgentA
+
+        Mediator -> SimulationEngine : introductionRequested(AgentA)
+
+        SimulationEngine -> SimulationEngine : selectUnknownAgent(AgentA)
+        SimulationEngine --> Mediator : selectedAgent(AgentB)
+
+        Mediator -> AgentA : introduce(AgentB)
+        Mediator -> AgentB : introduce(AgentA)
+
+        Mediator -> SimulationEngine : relationshipUpdated(AgentA, AgentB, JUST_MET)
+
+        Mediator -> Logger : logEvent(introduction)
+        activate Logger
+        Logger --> Mediator : logged
+        deactivate Logger
+
+    else propose to AgentB
         AgentA --> Mediator : proposal(AgentB)
         deactivate AgentA
 
@@ -94,49 +122,39 @@ loop Until matching is complete
             AgentB --> Mediator : accept
             deactivate AgentB
 
-            Mediator -> AgentA : updateMatch(AgentB)
-            activate AgentA
-            AgentA --> Mediator : acknowledged
-            deactivate AgentA
-
-            Mediator -> AgentB : updateMatch(AgentA)
-            activate AgentB
-            AgentB --> Mediator : acknowledged
-            deactivate AgentB
+            Mediator -> SimulationEngine : matchCreated(AgentA, AgentB)
 
         else Reject
             AgentB --> Mediator : reject
             deactivate AgentB
 
-            Mediator -> AgentA : notifyRejection()
-            activate AgentA
-            AgentA --> Mediator : acknowledged
-            deactivate AgentA
+            Mediator -> SimulationEngine : proposalRejected(AgentA, AgentB)
 
         else Switch
             AgentB --> Mediator : switch
             deactivate AgentB
 
-            Mediator -> AgentA : updateMatch(AgentB)
-            activate AgentA
-            AgentA --> Mediator : acknowledged
-            deactivate AgentA
+            Mediator -> AgentC : notifyUnmatched()
+            activate AgentC
+            AgentC --> Mediator : acknowledged
+            deactivate AgentC
 
-            Mediator -> AgentB : updateMatch(AgentA)
-            activate AgentB
-            AgentB --> Mediator : acknowledged
-            deactivate AgentB
-
-            Mediator -> Mediator : releaseOldMatch()
+            Mediator -> SimulationEngine : matchBroken(AgentB, AgentC)
+            Mediator -> SimulationEngine : matchCreated(AgentA, AgentB)
         end
 
-        Mediator -> Logger : logEvent()
+        Mediator -> Logger : logEvent(proposal)
         activate Logger
         Logger --> Mediator : logged
         deactivate Logger
     end
 
     deactivate Mediator
+
+    SimulationEngine -> Logger : logCycleSummary()
+    activate Logger
+    Logger --> SimulationEngine : logged
+    deactivate Logger
 
     SimulationEngine -> SimulationEngine : checkCompletion()
 
@@ -148,4 +166,5 @@ SimulationEngine --> CLISystem : resultsReady()
 deactivate SimulationEngine
 
 CLISystem -> User : showOutput()
+
 @enduml
