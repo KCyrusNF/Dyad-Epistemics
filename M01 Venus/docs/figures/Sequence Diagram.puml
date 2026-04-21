@@ -1,10 +1,10 @@
 @startuml
+!theme mars
 
+title "Model 01: Venus Sequence Diagram"
 
-title "Model 01: Venus Sequence Diagram (Cycle-based Logging)"
-
-actor User
-participant "CLI System" as CLISystem
+actor Researcher
+participant "CLI-Based System" as CLISystem
 participant "Configuration Controller" as ConfigController
 participant AgentBuilder
 participant SimulationEngine
@@ -20,12 +20,8 @@ participant "Rule Engine C" as RuleEngineC
 
 == System Initialization ==
 
+Researcher -> CLISystem : enter configurations
 CLISystem -> ConfigController : initializeSystem()
-
-== User Interaction ==
-
-User -> CLISystem : enter command (start/configure)
-CLISystem -> ConfigController : parseCommand()
 
 == Configuration Phase ==
 
@@ -64,7 +60,7 @@ activate SimulationEngine
 
 loop Until matching is complete
 
-    SimulationEngine -> SimulationEngine : selectNextFreeAgent()
+    SimulationEngine -> SimulationEngine : selectNextAgent()
     SimulationEngine -> Mediator : activateAgent(AgentA)
     activate Mediator
 
@@ -165,6 +161,5 @@ end
 SimulationEngine --> CLISystem : resultsReady()
 deactivate SimulationEngine
 
-CLISystem -> User : showOutput()
-
+CLISystem -> Researcher : showOutput()
 @enduml
