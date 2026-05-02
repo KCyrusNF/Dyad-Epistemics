@@ -100,6 +100,39 @@ loop Until matching is complete
         Mediator -> Logger : logEvent(introduction)
         activate Logger
         Logger --> Mediator : logged
+        deactivate 
+    
+    else updateKnownRelationship
+        AgentA --> Mediator : updateKnownRelationship(AgentB)
+        deactivate AgentA
+
+        Mediator -> AgentB : requestRelationshipStatus()
+        activate AgentB
+
+        AgentB -> RuleEngineB : discloseRelationshipStatus()
+        activate RuleEngineB
+        RuleEngineB --> AgentB : taken / free / unknown
+        deactivate RuleEngineB
+
+        AgentB --> Mediator : relationshipStatus(taken/free/unknown)
+        deactivate AgentB
+
+        Mediator -> AgentA : updateKnowledge(AgentB, relationshipStatus)
+        activate AgentA
+
+        AgentA -> RuleEngineA : reviseInterest(AgentB, relationshipStatus)
+        activate RuleEngineA
+        RuleEngineA --> AgentA : interestUpdated
+        deactivate RuleEngineA
+
+        AgentA --> Mediator : acknowledged
+        deactivate AgentA
+
+        Mediator -> SimulationEngine : relationshipKnowledgeUpdated(AgentA, AgentB)
+
+        Mediator -> Logger : logEvent(relationshipUpdate)
+        activate Logger
+        Logger --> Mediator : logged
         deactivate Logger
 
     else propose to AgentB
